@@ -205,7 +205,7 @@ git_mirror_submodules (const char     *repo_location,
           if (g_strcmp0 (words[0], "160000") != 0)
             continue;
 
-          if (!builder_git_mirror_repo (absolute_url, update, TRUE, words[2], context, error))
+          if (!builder_git_mirror_repo (absolute_url, NULL, update, TRUE, words[2], context, error))
             return FALSE;
         }
     }
@@ -215,6 +215,7 @@ git_mirror_submodules (const char     *repo_location,
 
 gboolean
 builder_git_mirror_repo (const char     *repo_location,
+                         const char     *destination_path,
                          gboolean        update,
                          gboolean        mirror_submodules,
                          const char     *ref,
@@ -225,6 +226,11 @@ builder_git_mirror_repo (const char     *repo_location,
   g_autofree char *current_commit = NULL;
 
   mirror_dir = git_get_mirror_dir (repo_location, context);
+
+  if (destination_path != NULL)
+    mirror_dir = g_file_new_for_path (g_build_filename (destination_path,
+                                                        g_file_get_basename (mirror_dir),
+                                                        NULL));
 
   if (!g_file_query_exists (mirror_dir, NULL))
     {

@@ -182,6 +182,7 @@ builder_source_git_download (BuilderSource  *source,
     return FALSE;
 
   if (!builder_git_mirror_repo (location,
+                                NULL,
                                 update_vcs, TRUE,
                                 get_branch (self),
                                 context,
@@ -207,6 +208,39 @@ builder_source_git_extract (BuilderSource  *source,
 
   if (!builder_git_checkout (location, get_branch (self),
                              dest, context, error))
+    return FALSE;
+
+  return TRUE;
+}
+
+static gboolean
+builder_source_git_bundle (BuilderSource  *source,
+                           BuilderContext *context,
+                           GError        **error)
+{
+  BuilderSourceGit *self = BUILDER_SOURCE_GIT (source);
+  g_autofree char *location = NULL;
+  g_autofree char *destination_path = NULL;
+	g_autoptr(GFile) destination = NULL;
+
+  location = get_url_or_path (self, context, error);
+
+  if (location == NULL)
+    return FALSE;
+
+	destination_path = g_build_filename (g_file_get_path (builder_context_get_app_dir (context)),
+																			"files/lib/sources/git", NULL);
+  destination = g_file_new_for_path (destination_path);
+  if (!g_file_query_exists (destination, NULL) &&
+      !g_file_make_directory_with_parents (destination, NULL, error))
+    return FALSE;
+
+  if (!builder_git_mirror_repo (location,
+                                destination_path,
+                                FALSE, TRUE,
+                                get_branch (self),
+                                context,
+                                error))
     return FALSE;
 
   return TRUE;
@@ -276,6 +310,7 @@ builder_source_git_class_init (BuilderSourceGitClass *klass)
 
   source_class->download = builder_source_git_download;
   source_class->extract = builder_source_git_extract;
+	source_class->bundle = builder_source_git_bundle;
   source_class->update = builder_source_git_update;
   source_class->checksum = builder_source_git_checksum;
 

@@ -344,6 +344,7 @@ main (int    argc,
       g_autoptr(GFile) build_subdir = NULL;
 
       if (!builder_git_mirror_repo (opt_from_git,
+                                    NULL,
                                     !opt_disable_updates, FALSE,
                                     git_branch, build_context, &error))
         {
@@ -584,6 +585,7 @@ main (int    argc,
   if (!opt_build_only && opt_repo && builder_cache_has_checkout (cache))
     {
       g_autoptr(GFile) debuginfo_metadata = NULL;
+      g_autoptr(GFile) sourcesinfo_metadata = NULL;
 
       g_print ("Exporting %s to repo\n", builder_manifest_get_id (manifest));
 
@@ -639,6 +641,23 @@ main (int    argc,
           if (!do_export (build_context, &error, TRUE,
                           "--metadata=metadata.debuginfo",
                           builder_context_get_build_runtime (build_context) ? "--files=usr/lib/debug" : "--files=files/lib/debug",
+                          opt_repo, app_dir_path, builder_manifest_get_branch (manifest), NULL))
+            {
+              g_printerr ("Export failed: %s\n", error->message);
+              return 1;
+            }
+        }
+
+      /* Export sources extensions */
+      sourcesinfo_metadata = g_file_get_child (app_dir, "metadata.sourcesinfo");
+      if (g_file_query_exists (sourcesinfo_metadata, NULL))
+        {
+          g_autofree char *sources_id = builder_manifest_get_sources_id (manifest);
+          g_print ("Exporting %s to repo\n", sources_id);
+
+          if (!do_export (build_context, &error, TRUE,
+                          "--metadata=metadata.sourcesinfo",
+                          builder_context_get_build_runtime (build_context) ? "--files=usr/lib/sources" : "--files=files/lib/sources",
                           opt_repo, app_dir_path, builder_manifest_get_branch (manifest), NULL))
             {
               g_printerr ("Export failed: %s\n", error->message);
