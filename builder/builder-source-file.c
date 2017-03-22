@@ -424,6 +424,47 @@ builder_source_file_extract (BuilderSource  *source,
 }
 
 static gboolean
+builder_source_file_bundle (BuilderSource  *source,
+                            BuilderContext *context,
+                            GError        **error)
+{
+  BuilderSourceFile *self = BUILDER_SOURCE_FILE (source);
+
+  g_autoptr(GFile) src = NULL;
+	g_autoptr(GFile) base_dir = NULL;
+	g_autoptr(GFile) destination_path = NULL;
+	g_autoptr(GFile) destination_file = NULL;
+  g_autofree char *archive_path = NULL;
+  gboolean is_local, is_inline;
+
+  src = get_source_file (self, context, &is_local, &is_inline, error);
+  if (src == NULL)
+    return FALSE;
+
+  base_dir = g_file_get_parent (src);
+
+  destination_path = g_file_new_for_path (g_build_filename (g_file_get_path (builder_context_get_app_dir (context)),
+                                                            "files/lib/sources/downloads",
+                                                            self->sha256,
+                                                            NULL));
+  if (!g_file_query_exists (destination_path, NULL) &&
+      !g_file_make_directory_with_parents (destination_path, NULL, error))
+    return FALSE;
+  destination_file = g_file_new_for_path (g_build_filename (g_file_get_path (destination_path),
+                                                            g_file_get_basename(src),
+                                                            NULL));
+
+  if (!g_file_copy (src, destination_file,
+                    G_FILE_COPY_OVERWRITE,
+                    NULL,
+                    NULL, NULL,
+                    error))
+    return FALSE;
+
+  return TRUE;
+}
+
+static gboolean
 builder_source_file_update (BuilderSource  *source,
                             BuilderContext *context,
                             GError        **error)
@@ -498,6 +539,7 @@ builder_source_file_class_init (BuilderSourceFileClass *klass)
   source_class->show_deps = builder_source_file_show_deps;
   source_class->download = builder_source_file_download;
   source_class->extract = builder_source_file_extract;
+  source_class->bundle = builder_source_file_bundle;
   source_class->update = builder_source_file_update;
   source_class->checksum = builder_source_file_checksum;
 
