@@ -219,24 +219,27 @@ builder_source_git_bundle (BuilderSource  *source,
                            GError        **error)
 {
   BuilderSourceGit *self = BUILDER_SOURCE_GIT (source);
+
   g_autofree char *location = NULL;
-  g_autofree char *destination_path = NULL;
-  g_autoptr(GFile) destination = NULL;
+  g_autoptr(GFile) mirror_dir = NULL;
+  g_autofree char *mirror_dir_path = NULL;
+  g_autofree char *app_dir_path = g_file_get_path (builder_context_get_app_dir (context));
 
   location = get_url_or_path (self, context, error);
 
   if (location == NULL)
     return FALSE;
 
-	destination_path = g_build_filename (g_file_get_path (builder_context_get_app_dir (context)),
-																			"files/lib/sources/git", NULL);
-  destination = g_file_new_for_path (destination_path);
-  if (!g_file_query_exists (destination, NULL) &&
-      !g_file_make_directory_with_parents (destination, NULL, error))
+  mirror_dir_path = g_build_filename (app_dir_path,
+                                      "files/lib/sources/git",
+                                      NULL);
+  mirror_dir = g_file_new_for_path (mirror_dir_path);
+  if (!g_file_query_exists (mirror_dir, NULL) &&
+      !g_file_make_directory_with_parents (mirror_dir, NULL, error))
     return FALSE;
 
   if (!builder_git_mirror_repo (location,
-                                destination_path,
+                                mirror_dir_path,
                                 FALSE, TRUE,
                                 get_branch (self),
                                 context,
