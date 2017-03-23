@@ -587,31 +587,35 @@ builder_source_archive_bundle (BuilderSource  *source,
 {
   BuilderSourceArchive *self = BUILDER_SOURCE_ARCHIVE (source);
 
-  g_autoptr(GFile) archive_file = NULL;
-  g_autoptr(GFile) base_dir = NULL;
-  g_autoptr(GFile) destination_path = NULL;
+  g_autoptr(GFile) file = NULL;
+  g_autoptr(GFile) download_dir = NULL;
   g_autoptr(GFile) destination_file = NULL;
-  g_autofree char *archive_path = NULL;
+  g_autofree char *download_dir_path = NULL;
+  g_autofree char *file_name = NULL;
+  g_autofree char *destination_file_path = NULL;
+  g_autofree char *app_dir_path = g_file_get_path (builder_context_get_app_dir (context));
   gboolean is_local;
 
-  archive_file = get_source_file (self, context, &is_local, error);
-  if (archive_file == NULL)
+  file = get_source_file (self, context, &is_local, error);
+  if (file == NULL)
     return FALSE;
 
-  base_dir = g_file_get_parent (archive_file);
-
-  destination_path = g_file_new_for_path (g_build_filename (g_file_get_path (builder_context_get_app_dir (context)),
-                                                            "files/lib/sources/downloads",
-                                                            self->sha256,
-                                                            NULL));
-  if (!g_file_query_exists (destination_path, NULL) &&
-      !g_file_make_directory_with_parents (destination_path, NULL, error))
+  download_dir_path = g_build_filename (app_dir_path,
+                                        "files/lib/sources/downloads",
+                                        self->sha256,
+                                        NULL);
+  download_dir = g_file_new_for_path (download_dir_path);
+  if (!g_file_query_exists (download_dir, NULL) &&
+      !g_file_make_directory_with_parents (download_dir, NULL, error))
     return FALSE;
-  destination_file = g_file_new_for_path (g_build_filename (g_file_get_path (destination_path),
-                                                            g_file_get_basename(archive_file),
-                                                            NULL));
 
-  if (!g_file_copy (archive_file, destination_file,
+  file_name = g_file_get_basename (file);
+  destination_file_path = g_build_filename (download_dir_path,
+                                            file_name,
+                                            NULL);
+  destination_file = g_file_new_for_path (destination_file_path);
+
+  if (!g_file_copy (file, destination_file,
                     G_FILE_COPY_OVERWRITE,
                     NULL,
                     NULL, NULL,
