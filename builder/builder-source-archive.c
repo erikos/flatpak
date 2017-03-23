@@ -588,9 +588,9 @@ builder_source_archive_bundle (BuilderSource  *source,
   BuilderSourceArchive *self = BUILDER_SOURCE_ARCHIVE (source);
 
   g_autoptr(GFile) archive_file = NULL;
-	g_autoptr(GFile) base_dir = NULL;
-	g_autoptr(GFile) destination_path = NULL;
-	g_autoptr(GFile) destination_file = NULL;
+  g_autoptr(GFile) base_dir = NULL;
+  g_autoptr(GFile) destination_path = NULL;
+  g_autoptr(GFile) destination_file = NULL;
   g_autofree char *archive_path = NULL;
   gboolean is_local;
 

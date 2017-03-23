@@ -221,7 +221,7 @@ builder_source_git_bundle (BuilderSource  *source,
   BuilderSourceGit *self = BUILDER_SOURCE_GIT (source);
   g_autofree char *location = NULL;
   g_autofree char *destination_path = NULL;
-	g_autoptr(GFile) destination = NULL;
+  g_autoptr(GFile) destination = NULL;
 
   location = get_url_or_path (self, context, error);
 
@@ -310,7 +310,7 @@ builder_source_git_class_init (BuilderSourceGitClass *klass)
 
   source_class->download = builder_source_git_download;
   source_class->extract = builder_source_git_extract;
-	source_class->bundle = builder_source_git_bundle;
+  source_class->bundle = builder_source_git_bundle;
   source_class->update = builder_source_git_update;
   source_class->checksum = builder_source_git_checksum;
 

@@ -431,16 +431,16 @@ builder_source_file_bundle (BuilderSource  *source,
   BuilderSourceFile *self = BUILDER_SOURCE_FILE (source);
 
   g_autoptr(GFile) src = NULL;
-	g_autoptr(GFile) base_dir = NULL;
-	g_autoptr(GFile) destination_path = NULL;
-	g_autoptr(GFile) destination_file = NULL;
-  g_autofree char *archive_path = NULL;
+  g_autoptr(GFile) base_dir = NULL;
+  g_autoptr(GFile) destination_path = NULL;
+  g_autoptr(GFile) destination_file = NULL;
   gboolean is_local, is_inline;
 
   src = get_source_file (self, context, &is_local, &is_inline, error);
   if (src == NULL)
     return FALSE;
 
+  base_name = g_file_get_basename (file);
   base_dir = g_file_get_parent (src);
 
   destination_path = g_file_new_for_path (g_build_filename (g_file_get_path (builder_context_get_app_dir (context)),
