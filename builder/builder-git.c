@@ -228,9 +228,13 @@ builder_git_mirror_repo (const char     *repo_location,
   mirror_dir = git_get_mirror_dir (repo_location, context);
 
   if (destination_path != NULL)
-    mirror_dir = g_file_new_for_path (g_build_filename (destination_path,
-                                                        g_file_get_basename (mirror_dir),
-                                                        NULL));
+    {
+      g_autofree char *filename = g_file_get_basename (mirror_dir);
+      g_object_unref (mirror_dir);
+      mirror_dir = g_file_new_for_path (g_build_filename (destination_path,
+                                                          filename,
+                                                          NULL));
+    }
 
   if (!g_file_query_exists (mirror_dir, NULL))
     {
