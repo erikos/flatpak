@@ -587,18 +587,18 @@ builder_source_archive_bundle (BuilderSource  *source,
 {
   BuilderSourceArchive *self = BUILDER_SOURCE_ARCHIVE (source);
 
-  g_autoptr(GFile) archivefile = NULL;
+  g_autoptr(GFile) archive_file = NULL;
 	g_autoptr(GFile) base_dir = NULL;
 	g_autoptr(GFile) destination_path = NULL;
 	g_autoptr(GFile) destination_file = NULL;
   g_autofree char *archive_path = NULL;
   gboolean is_local;
 
-  archivefile = get_source_file (self, context, &is_local, error);
-  if (archivefile == NULL)
+  archive_file = get_source_file (self, context, &is_local, error);
+  if (archive_file == NULL)
     return FALSE;
 
-  base_dir = g_file_get_parent (archivefile);
+  base_dir = g_file_get_parent (archive_file);
 
   destination_path = g_file_new_for_path (g_build_filename (g_file_get_path (builder_context_get_app_dir (context)),
                                                             "files/lib/sources/downloads",
@@ -608,10 +608,10 @@ builder_source_archive_bundle (BuilderSource  *source,
       !g_file_make_directory_with_parents (destination_path, NULL, error))
     return FALSE;
   destination_file = g_file_new_for_path (g_build_filename (g_file_get_path (destination_path),
-                                                            g_file_get_basename(archivefile),
+                                                            g_file_get_basename(archive_file),
                                                             NULL));
 
-  if (!g_file_copy (archivefile, destination_file,
+  if (!g_file_copy (archive_file, destination_file,
                     G_FILE_COPY_OVERWRITE,
                     NULL,
                     NULL, NULL,
