@@ -2150,13 +2150,13 @@ builder_manifest_finish (BuilderManifest *self,
         {
           debuginfo_dir = g_file_resolve_relative_path (app_dir, "usr/lib/debug");
           locale_parent_dir = g_file_resolve_relative_path (app_dir, "usr/" LOCALES_SEPARATE_DIR);
-          sources_dir = g_file_resolve_relative_path (app_dir, "usr/lib/sources");
+          sources_dir = g_file_resolve_relative_path (app_dir, "usr/sources");
         }
       else
         {
           debuginfo_dir = g_file_resolve_relative_path (app_dir, "files/lib/debug");
           locale_parent_dir = g_file_resolve_relative_path (app_dir, "files/" LOCALES_SEPARATE_DIR);
-          sources_dir = g_file_resolve_relative_path (app_dir, "files/lib/sources");
+          sources_dir = g_file_resolve_relative_path (app_dir, "sources");
         }
 
       if (self->separate_locales && g_file_query_exists (locale_parent_dir, NULL))
@@ -2237,7 +2237,7 @@ builder_manifest_finish (BuilderManifest *self,
           g_autofree char *metadata_contents = NULL;
           g_autofree char *sources_id = builder_manifest_get_sources_id (self);
 
-          metadata_sources_file = g_file_get_child (app_dir, "metadata.sourcesinfo");
+          metadata_sources_file = g_file_get_child (app_dir, "metadata.sources");
 
           metadata_contents = g_strdup_printf ("[Runtime]\n"
                                                "name=%s\n", sources_id);
