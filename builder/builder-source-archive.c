@@ -601,7 +601,7 @@ builder_source_archive_bundle (BuilderSource  *source,
     return FALSE;
 
   download_dir_path = g_build_filename (app_dir_path,
-                                        "files/lib/sources/downloads",
+                                        "files/sources/downloads",
                                         self->sha256,
                                         NULL);
   download_dir = g_file_new_for_path (download_dir_path);
