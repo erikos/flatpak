@@ -231,7 +231,7 @@ builder_source_git_bundle (BuilderSource  *source,
     return FALSE;
 
   mirror_dir_path = g_build_filename (app_dir_path,
-                                      "files/sources/git",
+                                      "sources/git",
                                       NULL);
   mirror_dir = g_file_new_for_path (mirror_dir_path);
   if (!g_file_query_exists (mirror_dir, NULL) &&
