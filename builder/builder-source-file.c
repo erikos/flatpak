@@ -170,6 +170,8 @@ get_download_location (BuilderSourceFile *self,
   GFile *download_dir = NULL;
   g_autoptr(GFile) sha256_dir = NULL;
   g_autoptr(GFile) file = NULL;
+  GPtrArray *sources_dirs = NULL;
+  int i;
 
   uri = get_uri (self, error);
   if (uri == NULL)
@@ -189,6 +191,17 @@ get_download_location (BuilderSourceFile *self,
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED, "Sha256 not specified");
       return FALSE;
+    }
+
+  sources_dirs = builder_context_get_sources_dirs (context);
+  for (i = 0; i < sources_dirs->len; i++)
+    {
+      GFile* sources_root = g_ptr_array_index (sources_dirs, i);
+      g_autoptr(GFile) local_download_dir = g_file_get_child (sources_root, "downloads");
+      g_autoptr(GFile) local_sha256_dir = g_file_get_child (local_download_dir, self->sha256);
+      g_autoptr(GFile) local_file = g_file_get_child (local_sha256_dir, base_name);
+      if (g_file_query_exists (local_file, NULL))
+        return g_steal_pointer (&local_file);
     }
 
   download_dir = builder_context_get_download_dir (context);

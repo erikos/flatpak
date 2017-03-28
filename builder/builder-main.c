@@ -61,6 +61,7 @@ static char *opt_subject;
 static char *opt_body;
 static char *opt_gpg_homedir;
 static char **opt_key_ids;
+static char **opt_sources_dirs;
 static int opt_jobs;
 
 static GOptionEntry entries[] = {
@@ -74,6 +75,7 @@ static GOptionEntry entries[] = {
   { "disable-download", 0, 0, G_OPTION_ARG_NONE, &opt_disable_download, "Don't download any new sources", NULL },
   { "disable-updates", 0, 0, G_OPTION_ARG_NONE, &opt_disable_updates, "Only download missing sources, never update to latest vcs version", NULL },
   { "download-only", 0, 0, G_OPTION_ARG_NONE, &opt_download_only, "Only download sources, don't build", NULL },
+  { "use-sources", 0, 0, G_OPTION_ARG_STRING_ARRAY, &opt_sources_dirs, "Specify a directory with sources to build from", "SOURCE-DIR"},
   { "build-only", 0, 0, G_OPTION_ARG_NONE, &opt_build_only, "Stop after build, don't run clean and finish phases", NULL },
   { "finish-only", 0, 0, G_OPTION_ARG_NONE, &opt_finish_only, "Only run clean and finish and export phases", NULL },
   { "allow-missing-runtimes", 0, 0, G_OPTION_ARG_NONE, &opt_allow_missing_runtimes, "Don't fail if runtime and sdk missing", NULL },
@@ -224,6 +226,7 @@ main (int    argc,
   g_autoptr(FlatpakContext) arg_context = NULL;
   g_autoptr(FlatpakTempDir) cleanup_manifest_dir = NULL;
   g_autofree char *manifest_basename = NULL;
+  g_autoptr(GPtrArray) sources_dirs = NULL;
   int i, first_non_arg, orig_argc;
   int argnr;
 
@@ -319,6 +322,14 @@ main (int    argc,
   builder_context_set_sandboxed (build_context, opt_sandboxed);
   builder_context_set_jobs (build_context, opt_jobs);
   builder_context_set_rebuild_on_sdk_change (build_context, opt_rebuild_on_sdk_change);
+
+  sources_dirs = g_ptr_array_new_with_free_func (g_object_unref);
+  for (i = 0; opt_sources_dirs != NULL && opt_sources_dirs[i] != NULL; i++)
+    {
+      GFile *file = g_file_new_for_commandline_arg (opt_sources_dirs[i]);
+      g_ptr_array_add (sources_dirs, file);
+    }
+  builder_context_set_sources_dirs (build_context, sources_dirs);
 
   if (opt_arch)
     builder_context_set_arch (build_context, opt_arch);
@@ -497,6 +508,7 @@ main (int    argc,
 
   if (!opt_finish_only &&
       !opt_disable_download &&
+      !opt_sources_dirs &&
       !builder_manifest_download (manifest, !opt_disable_updates, opt_build_shell, build_context, &error))
     {
       g_printerr ("Failed to download sources: %s\n", error->message);
