@@ -75,7 +75,7 @@ static GOptionEntry entries[] = {
   { "disable-download", 0, 0, G_OPTION_ARG_NONE, &opt_disable_download, "Don't download any new sources", NULL },
   { "disable-updates", 0, 0, G_OPTION_ARG_NONE, &opt_disable_updates, "Only download missing sources, never update to latest vcs version", NULL },
   { "download-only", 0, 0, G_OPTION_ARG_NONE, &opt_download_only, "Only download sources, don't build", NULL },
-  { "use-sources", 0, 0, G_OPTION_ARG_STRING_ARRAY, &opt_sources_dirs, "Specify a directory with sources to build from", "SOURCE-DIR"},
+  { "use-sources", 0, 0, G_OPTION_ARG_STRING_ARRAY, &opt_sources_dirs, "Build the sources specified by SOURCE-DIR, multiple uses of this option possible", "SOURCE-DIR"},
   { "build-only", 0, 0, G_OPTION_ARG_NONE, &opt_build_only, "Stop after build, don't run clean and finish phases", NULL },
   { "finish-only", 0, 0, G_OPTION_ARG_NONE, &opt_finish_only, "Only run clean and finish and export phases", NULL },
   { "allow-missing-runtimes", 0, 0, G_OPTION_ARG_NONE, &opt_allow_missing_runtimes, "Don't fail if runtime and sdk missing", NULL },
