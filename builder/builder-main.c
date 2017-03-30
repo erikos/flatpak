@@ -323,13 +323,16 @@ main (int    argc,
   builder_context_set_jobs (build_context, opt_jobs);
   builder_context_set_rebuild_on_sdk_change (build_context, opt_rebuild_on_sdk_change);
 
-  sources_dirs = g_ptr_array_new_with_free_func (g_object_unref);
-  for (i = 0; opt_sources_dirs != NULL && opt_sources_dirs[i] != NULL; i++)
+  if (opt_sources_dirs)
     {
-      GFile *file = g_file_new_for_commandline_arg (opt_sources_dirs[i]);
-      g_ptr_array_add (sources_dirs, file);
+      sources_dirs = g_ptr_array_new_with_free_func (g_object_unref);
+      for (i = 0; opt_sources_dirs != NULL && opt_sources_dirs[i] != NULL; i++)
+        {
+          GFile *file = g_file_new_for_commandline_arg (opt_sources_dirs[i]);
+          g_ptr_array_add (sources_dirs, file);
+        }
+      builder_context_set_sources_dirs (build_context, sources_dirs);
     }
-  builder_context_set_sources_dirs (build_context, sources_dirs);
 
   if (opt_arch)
     builder_context_set_arch (build_context, opt_arch);

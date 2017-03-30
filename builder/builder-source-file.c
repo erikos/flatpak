@@ -194,7 +194,7 @@ get_download_location (BuilderSourceFile *self,
     }
 
   sources_dirs = builder_context_get_sources_dirs (context);
-  for (i = 0; i < sources_dirs->len; i++)
+  for (i = 0; sources_dirs != NULL && i < sources_dirs->len; i++)
     {
       GFile* sources_root = g_ptr_array_index (sources_dirs, i);
       g_autoptr(GFile) local_download_dir = g_file_get_child (sources_root, "downloads");

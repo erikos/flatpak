@@ -60,7 +60,7 @@ git_get_mirror_dir (const char     *url_or_path,
   int i;
 
   sources_dirs = builder_context_get_sources_dirs (context);
-  for (i = 0; i < sources_dirs->len; i++)
+  for (i = 0; sources_dirs != NULL && i < sources_dirs->len; i++)
     {
       GFile* sources_root = g_ptr_array_index (sources_dirs, i);
       g_autoptr(GFile) local_git_dir = g_file_get_child (sources_root, "git");
