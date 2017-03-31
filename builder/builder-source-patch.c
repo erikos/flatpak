@@ -254,6 +254,14 @@ builder_source_patch_extract (BuilderSource  *source,
   return TRUE;
 }
 
+static gboolean
+builder_source_patch_bundle (BuilderSource  *source,
+                             BuilderContext *context,
+                             GError        **error)
+{
+  return TRUE;
+}
+
 static void
 builder_source_patch_checksum (BuilderSource  *source,
                                BuilderCache   *cache,
@@ -290,6 +298,7 @@ builder_source_patch_class_init (BuilderSourcePatchClass *klass)
   source_class->show_deps = builder_source_patch_show_deps;
   source_class->download = builder_source_patch_download;
   source_class->extract = builder_source_patch_extract;
+  source_class->bundle = builder_source_patch_bundle;
   source_class->checksum = builder_source_patch_checksum;
 
   g_object_class_install_property (object_class,
